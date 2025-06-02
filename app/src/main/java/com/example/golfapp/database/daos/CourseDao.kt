@@ -21,6 +21,9 @@ interface CourseDao {
     @Query("SELECT * FROM course where course.name = :name")
     suspend fun getCourseByName(name: String): Course
 
+    @Query("SELECT * FROM course where course.id = :id")
+    suspend fun getCourseById(id: Int): Course
+
 //    @Query("SELECT course.name, coursehole.hole_number, coursehole.par, coursehole.`index` FROM course join coursehole on coursehole.course_id = course.id WHERE name = :name")
 //    fun getCourseByName(name: String): CourseWithHoles
 

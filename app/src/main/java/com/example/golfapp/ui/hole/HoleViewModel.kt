@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.golfapp.database.daos.CourseDao
 import com.example.golfapp.database.entities.Round
 import com.example.golfapp.repository.CourseHoleRepository
 import com.example.golfapp.repository.RoundRepository
@@ -15,26 +16,42 @@ import javax.inject.Inject
 @HiltViewModel
 class HoleViewModel @Inject constructor(
     private val roundRepository: RoundRepository,
-    private val courseHoleRepository: CourseHoleRepository
+    private val courseDao: CourseDao
 ): ViewModel() {
 
-    
+    var courseName by mutableStateOf("")
+        private set
+
+    var currentHole by mutableStateOf(1)
+        internal set
+
+    var 
+
+    var isLoading by mutableStateOf(true)
+        private set
 
     var score by mutableStateOf(0)
         internal set
 
     var roundDetails: Round? by mutableStateOf(null)
 
-    fun getRoundDetails(roundId: Int) {
+    fun loadRoundData(roundId: Int) {
         viewModelScope.launch {
-            roundDetails = roundRepository.getRoundById(roundId)
+            try {
+                isLoading = true
+                val roundDetails = roundRepository.getCurrentRound()
+                if (roundDetails != null) {
+                    val course = courseDao.getCourseById(roundDetails.courseId)
+                    courseName = course.name
+                }
+
+            } catch (e: Exception) {
+                courseName = "unknown error"
+                println(e)
+            } finally {
+                isLoading = false
+            }
+
         }
     }
-
-    fun getCourseHoleDetails(courseId: Int, holeNumber: Int) {
-        viewModelScope.launch {
-            courseHoleRepository.getCourseHoleFromCourseByNumber(courseId, holeNumber)
-        }
-    }
-
 }

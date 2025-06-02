@@ -17,8 +17,7 @@ import androidx.room.PrimaryKey
     ]
 )
 data class CourseHole(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "course_id") val courseId: Int,
     @ColumnInfo(name = "hole_number") val holeNumber: Int,
     val par: Int,

@@ -35,7 +35,8 @@ class RoundRepository @Inject constructor(
             courseId = courseDao.getCourseByName(courseName).id,
             weather = converters.fromWeather(weather),
             wind = converters.fromWind(wind),
-            date = LocalDate.now()
+            date = LocalDate.now(),
+            isActive = true
         )
         return roundDao.upsertRound(newRound)
     }
