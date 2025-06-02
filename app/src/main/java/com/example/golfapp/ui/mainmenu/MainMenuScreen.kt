@@ -2,6 +2,7 @@ package com.example.golfapp.ui.mainmenu
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,12 +49,15 @@ fun MainMenuScreen(navController: NavController) {
         Box (
             modifier = Modifier
                 .fillMaxWidth(0.9f)
-                .shadow(5.dp, RoundedCornerShape(10.dp))
-                .clip(RoundedCornerShape(10.dp))
+                    .shadow(5.dp, RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
                 .background(MaterialTheme.colorScheme.surface),
             contentAlignment = Alignment.Center
         ) {
-            val gradientColors = listOf(Color.Black, Color.DarkGray, lightGreen, darkGreen)
+            val lightGradientColors = listOf(Color.Black, Color.DarkGray, lightGreen, darkGreen)
+            val darkGradientColors = listOf(Color.White, Color.LightGray, lightGreen, darkGreen)
+            val gradientColors = if (isSystemInDarkTheme()) darkGradientColors else lightGradientColors
+
             Text(
                 text = "Unnamed Golf App",
                 style = TextStyle(
@@ -66,6 +70,8 @@ fun MainMenuScreen(navController: NavController) {
                 textAlign = TextAlign.Center
             )
         }
+
+        // TODO - resume current round?
 
         MainMenuItem(
             "New Round",

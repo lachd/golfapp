@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 
 class Converters {
 
-    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE
 
     @TypeConverter
     fun fromWeather(weather: Weather): String = weather.name

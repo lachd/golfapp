@@ -12,5 +12,8 @@ interface CourseHoleDao {
     suspend fun upsertCourseHole(courseHole: CourseHole)
 
     @Query("SELECT * FROM coursehole WHERE course_id = :courseId")
-    fun getHolesForCourse(courseId: Int): List<CourseHole>
+    suspend fun getHolesForCourse(courseId: Int): List<CourseHole>
+
+    @Query("SELECT * FROM coursehole WHERE course_id = :courseId AND hole_number = :holeNumber")
+    suspend fun getHoleFromCourseByNumber(courseId: Int, holeNumber: Int): CourseHole
 }

@@ -17,9 +17,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.room.Room
 import com.example.golfapp.database.GolfDatabase
 import com.example.golfapp.ui.hole.HoleScreen
@@ -28,6 +30,7 @@ import com.example.golfapp.ui.newround.NewRoundScreen
 import com.example.golfapp.ui.theme.GolfAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.math.round
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -63,8 +66,19 @@ class MainActivity : ComponentActivity() {
                         composable("settings") {
                             SettingsScreen(navController)
                         }
-                        composable("hole") {
-                            HoleScreen(navController)
+                        composable(
+                            "hole/{roundId}",
+                            arguments = listOf(
+                                navArgument("roundId") {
+                                    type = NavType.IntType
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val roundId = backStackEntry.arguments?.getInt("roundId") ?: -1
+                            HoleScreen(
+                                roundId = roundId,
+                                navController = navController
+                            )
                         }
                     }
 

@@ -39,7 +39,9 @@ class NewRoundViewModel @Inject constructor(
     }
 
     fun selectWeather(weather: Weather) {
+        println("running select weather function, setting to $weather")
         selectedWeather = weather
+        println("new weather as $selectedWeather")
     }
 
     fun selectWind(wind: Wind) {
@@ -58,6 +60,7 @@ class NewRoundViewModel @Inject constructor(
                 onRoundStarted(roundId.toInt())
             } catch (e: Exception) {
                 // todo - display an error dialog
+                println(e)
             } finally {
                 isStartingRound = false
             }

@@ -56,11 +56,7 @@ fun NewRoundScreen(
     LaunchedEffect(Unit) {
         newRoundViewModel.checkForActiveRound { activeRoundId ->
             navController.navigate("hole/$activeRoundId") {
-                popUpToId
-                // TODO - maybe this should be:
-                //  navController.navigate("hole/$activeRoundId") {
-                //     popUpTo("newround") { inclusive = true }
-                //  }
+                popUpTo("newround") { inclusive = true }
             }
         }
     }
@@ -97,15 +93,15 @@ fun NewRoundScreen(
                     modifier = Modifier.padding(bottom = 8.dp),
                     courseList = newRoundViewModel.courses,
                     selectedCourse = newRoundViewModel.selectedCourse,
-                    onOptionSelected = {
-                        newRoundViewModel::selectCourse
+                    onOptionSelected = { course ->
+                        newRoundViewModel.selectCourse(course)
                     }
                 )
 
                 WeatherSelect(
                     selectedOption = newRoundViewModel.selectedWeather,
                     onOptionSelected = { weather ->
-                        newRoundViewModel::selectWeather
+                        newRoundViewModel.selectWeather(weather)
                     },
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -113,7 +109,7 @@ fun NewRoundScreen(
                 WindSelect(
                     selectedOption = newRoundViewModel.selectedWind,
                     onOptionSelected = { wind ->
-                        newRoundViewModel::selectWind
+                        newRoundViewModel.selectWind(wind)
                     },
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -139,7 +135,7 @@ fun StartNewRound(
         onClick = {
             newRoundViewModel.startNewRound { roundId ->
                 navController.navigate("hole/$roundId") {
-                    popUpToId
+//                    popUpTo("new_round") { inclusive = true }
                 }
             }
         }
