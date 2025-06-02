@@ -27,6 +27,7 @@ import com.example.golfapp.database.GolfDatabase
 import com.example.golfapp.ui.hole.HoleScreen
 import com.example.golfapp.ui.mainmenu.MainMenuScreen
 import com.example.golfapp.ui.newround.NewRoundScreen
+import com.example.golfapp.ui.roundstats.RoundStatsScreen
 import com.example.golfapp.ui.theme.GolfAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -76,6 +77,20 @@ class MainActivity : ComponentActivity() {
                         ) { backStackEntry ->
                             val roundId = backStackEntry.arguments?.getInt("roundId") ?: -1
                             HoleScreen(
+                                roundId = roundId,
+                                navController = navController
+                            )
+                        }
+                        composable(
+                            "round_stats/{roundId}",
+                            arguments = listOf(
+                                navArgument("roundId") {
+                                    type = NavType.IntType
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val roundId = backStackEntry.arguments?.getInt("roundId") ?: -1
+                            RoundStatsScreen(
                                 roundId = roundId,
                                 navController = navController
                             )

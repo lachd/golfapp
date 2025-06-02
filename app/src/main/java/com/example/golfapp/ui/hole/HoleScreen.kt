@@ -18,6 +18,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,53 +53,25 @@ fun HoleScreen(
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
 
-            TopBar(navController = navController, holeViewModel = holeViewModel)
-
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .size(36.dp)
-                    .clickable {
-                        navController.popBackStack()
-                    }
+            TopBar(
+                roundId = roundId,
+                navController = navController,
+                holeViewModel = holeViewModel
             )
 
             if (holeViewModel.isLoading) {
-                CircularProgressIndicator()
-                Text(
-                    text = "Loading round...",
-                    fontSize = MaterialTheme.typography.bodyLarge.fontSize
-                )
+                LoadingContent()
             } else {
-                
-
-                
-                Text("current roundId = ${roundId}")
-//                Text("playing course: ${holeViewModel.courseName}")
-
-                Text("par is ")
-
-                Spacer(modifier.height(16.dp))
-                StartShot(modifier = modifier)
-
-                Spacer(modifier.height(16.dp))
-                ShotHistory(modifier = modifier)
-
-                Spacer(modifier.height(16.dp))
-                ScoreSelector(
-                    holeViewModel,
-                    modifier = modifier
-                )
-                
+                HoleContent(holeViewModel = holeViewModel)
             }
+
         }
     }
 }
 
 @Composable
 private fun TopBar(
+    roundId: Int,
     navController: NavController,
     holeViewModel: HoleViewModel
 ) {
@@ -116,19 +90,21 @@ private fun TopBar(
                 .size(36.dp)
                 .clickable {
                     holeViewModel.saveRound() // Save before leaving
-                    navController.popBackStack()
+                    navController.navigate("new_round")
                 }
         )
 
         Text(
-            text = holeViewModel.roundDetails?.let { "Round at ${it.courseId}" } ?: "",
-            style = MaterialTheme.typography.titleMedium
+            text = holeViewModel.roundDetails?.let { "Round at ${it.}" } ?: "",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
 
         Button(
             onClick = {
                 holeViewModel.saveAndCompleteRound()
-                navController.popBackStack()
+                navController.navigate("round_stats/$roundId")
+                // TODO - this should go to stats screen
             }
         ) {
             Text("Finish Round")
@@ -137,56 +113,227 @@ private fun TopBar(
 }
 
 @Composable
-fun StartShot(modifier: Modifier = Modifier) {
-    Text(text = "placeholder for starting a shot")
+private fun LoadingContent() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        CircularProgressIndicator()
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Loading round...",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 @Composable
-fun ShotHistory(modifier: Modifier = Modifier) {
-    Text(text = "placeholder for shot history")
-}
+private fun HoleContent(holeViewModel: HoleViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(24.dp)
+    ) {
+        holeViewModel.currentHole?.let { hole ->
 
-@Composable
-fun ScoreSelector(
-    holeViewModel: HoleViewModel,
-    modifier: Modifier = Modifier
-) {
-    Text(text = "placeholder for setting the score")
-    Row {
-        Button(
-            onClick = {
+            HoleDetails(hole = hole)
 
-            },
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ChevronLeft,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+            ScoreSelector(
+                currentScore = hole.score,
+                par = hole.par,
+                onScoreChange = { newScore ->
+                    holeViewModel.updateCurrentHoleScore(newScore)
+                }
             )
         }
-        Box(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .shadow(5.dp, RoundedCornerShape(10.dp))
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.primary)
+
+        Spacer(modifier = Modifier.height(16.dp))
+        NewShot()
+
+        Spacer(modifier = Modifier.height(16.dp))
+        ShotHistory()
+
+        Spacer(modifier = Modifier.height(16.dp))
+        HoleNavigation(holeViewModel = holeViewModel)
+    }
+}
+
+@Composable
+private fun HoleDetails(hole: HoleData) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = holeViewModel.currentHole?.score.toString(),
-                modifier = Modifier.padding(16.dp)
+                text = "Hole ${hole.holeNumber}",
+                style = MaterialTheme.typography.titleLarge
             )
-        }
-        Button(
-            onClick = {
-
-            },
-        ) {
-            Icon(
-                imageVector = Icons.Filled.ChevronRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
+            Text(
+                text = "Par ${hole.par}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
     }
 }
 
+@Composable
+fun NewShot(modifier: Modifier = Modifier) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Shot tracking coming soon...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+    }
+}
+
+@Composable
+fun ShotHistory(modifier: Modifier = Modifier) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Shot history coming soon...",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScoreSelector(
+    currentScore: Int,
+    par: Int,
+    onScoreChange: (Int) -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Score",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Button(
+                onClick = {
+                    if (currentScore > 0) onScoreChange(currentScore - 1)
+                },
+                enabled = currentScore > 0
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronLeft,
+                    contentDescription = "Decrease score"
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .shadow(5.dp, RoundedCornerShape(10.dp))
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(MaterialTheme.colorScheme.primary)
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = if (currentScore == 0) "-" else currentScore.toString(),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    if (currentScore > 0) {
+                        Text(
+                            text = when (currentScore - par) {
+                                -3 -> "Albatross"
+                                -2 -> "Eagle"
+                                -1 -> "Birdie"
+                                0 -> "Par"
+                                1 -> "Bogey"
+                                2 -> "Double Bogey"
+                                else -> if (currentScore - par > 2) "+${currentScore - par}" else ""
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+            }
+
+            Button(
+                onClick = { onScoreChange(currentScore + 1) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = "Increase score"
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun HoleNavigation(holeViewModel: HoleViewModel) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Button(
+            onClick = { holeViewModel.navigatePrevious() },
+            enabled = holeViewModel.currentHoleIndex > 0
+        ) {
+            Text("Previous")
+        }
+
+        Box(
+            modifier = Modifier
+                .shadow(5.dp, RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(10.dp))
+                .background(MaterialTheme.colorScheme.primary)
+                .padding(horizontal = 24.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Hole ${holeViewModel.currentHole?.holeNumber ?: 1}",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+
+        Button(
+            onClick = { holeViewModel.navigateNext() },
+            enabled = holeViewModel.currentHoleIndex < holeViewModel.roundHoles.size - 1
+        ) {
+            Text("Next")
+        }
+    }
+}

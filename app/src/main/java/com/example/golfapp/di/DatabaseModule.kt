@@ -58,6 +58,7 @@ object DatabaseModule {
                             "golf_database"
                         ).build()
 
+                        populateTestDataIfNeeded(database)
                         clearTestRounds(database)
                     }
                 }
@@ -65,6 +66,17 @@ object DatabaseModule {
             .build()
 
 
+    }
+
+    private suspend fun populateTestDataIfNeeded(database: GolfDatabase) {
+        val courseDao = database.courseDao
+        val courseHoleDao = database.courseHoleDao
+
+        // Check if we already have courses
+        val existingCourses = courseDao.getCourses()
+        if (existingCourses.isEmpty()) {
+            populateTestData(database)
+        }
     }
 
     private suspend fun populateTestData(database: GolfDatabase) {

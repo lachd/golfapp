@@ -71,8 +71,7 @@ fun MainMenuScreen(navController: NavController) {
             )
         }
 
-        // TODO - resume current round?
-
+        // TODO - change text to 'resume round' if active round
         MainMenuItem(
             "New Round",
             onClick = { navController.navigate("new_round") },

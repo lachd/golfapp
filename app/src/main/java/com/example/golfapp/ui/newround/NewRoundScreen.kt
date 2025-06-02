@@ -135,7 +135,7 @@ fun StartNewRound(
         onClick = {
             newRoundViewModel.startNewRound { roundId ->
                 navController.navigate("hole/$roundId") {
-//                    popUpTo("new_round") { inclusive = true }
+                    popUpTo("new_round") { inclusive = true }
                 }
             }
         }
