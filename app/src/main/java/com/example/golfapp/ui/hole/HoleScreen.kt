@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,7 +43,6 @@ fun HoleScreen(
 ) {
     LaunchedEffect(roundId) {
         holeViewModel.loadRoundData(roundId)
-        holeViewModel.score = holeViewModel.
     }
 
     Scaffold (
@@ -50,6 +50,9 @@ fun HoleScreen(
             .fillMaxSize()
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
+
+            TopBar(navController = navController, holeViewModel = holeViewModel)
+
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = null,
@@ -69,13 +72,12 @@ fun HoleScreen(
                 )
             } else {
                 
-                HoleNavigation(
-                    holeViewModel = holeViewModel
-                )
+
                 
                 Text("current roundId = ${roundId}")
-                Text("playing course: ${holeViewModel.courseName}")
+//                Text("playing course: ${holeViewModel.courseName}")
 
+                Text("par is ")
 
                 Spacer(modifier.height(16.dp))
                 StartShot(modifier = modifier)
@@ -90,6 +92,46 @@ fun HoleScreen(
                 )
                 
             }
+        }
+    }
+}
+
+@Composable
+private fun TopBar(
+    navController: NavController,
+    holeViewModel: HoleViewModel
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Go back",
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .size(36.dp)
+                .clickable {
+                    holeViewModel.saveRound() // Save before leaving
+                    navController.popBackStack()
+                }
+        )
+
+        Text(
+            text = holeViewModel.roundDetails?.let { "Round at ${it.courseId}" } ?: "",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Button(
+            onClick = {
+                holeViewModel.saveAndCompleteRound()
+                navController.popBackStack()
+            }
+        ) {
+            Text("Finish Round")
         }
     }
 }
@@ -113,7 +155,7 @@ fun ScoreSelector(
     Row {
         Button(
             onClick = {
-                holeViewModel.score--
+
             },
         ) {
             Icon(
@@ -130,13 +172,13 @@ fun ScoreSelector(
                 .background(MaterialTheme.colorScheme.primary)
         ) {
             Text(
-                text = holeViewModel.score.toString(),
+                text = holeViewModel.currentHole?.score.toString(),
                 modifier = Modifier.padding(16.dp)
             )
         }
         Button(
             onClick = {
-                holeViewModel.score++
+
             },
         ) {
             Icon(
@@ -148,67 +190,3 @@ fun ScoreSelector(
     }
 }
 
-@Composable
-fun HoleNavigation(
-    holeViewModel: HoleViewModel,
-    modifier: Modifier = Modifier
-) {
-    Row {
-        if (holeViewModel.currentHole == 1) {
-            Button(
-                onClick = {
-
-                },
-            ) {
-                Text(
-                    text = "-"
-                )
-            }
-        } else {
-            Button(
-                onClick = {
-                    holeViewModel.currentHole--
-                },
-            ) {
-                Text(
-                    text = "${holeViewModel.currentHole - 1}"
-                )
-            }
-        }
-
-        Box(
-            modifier = modifier
-                .padding(horizontal = 16.dp)
-                .shadow(5.dp, RoundedCornerShape(10.dp))
-                .clip(RoundedCornerShape(10.dp))
-                .background(MaterialTheme.colorScheme.primary)
-        ) {
-            Text(
-                text = holeViewModel.currentHole.toString(),
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-        if (holeViewModel.currentHole == 18) {
-            Button(
-                onClick = {
-
-                },
-            ) {
-                Text(
-                    text = "-"
-                )
-            }
-        } else {
-            Button(
-                onClick = {
-                    holeViewModel.currentHole++
-                },
-            ) {
-                Text(
-                    text = "${holeViewModel.currentHole + 1}"
-                )
-            }
-        }
-
-    }
-}

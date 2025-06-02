@@ -8,6 +8,7 @@ import com.example.golfapp.database.GolfDatabase
 import com.example.golfapp.database.daos.CourseDao
 import com.example.golfapp.database.daos.CourseHoleDao
 import com.example.golfapp.database.daos.RoundDao
+import com.example.golfapp.database.daos.RoundHoleDao
 import com.example.golfapp.database.entities.Course
 import com.example.golfapp.database.entities.CourseHole
 import com.example.golfapp.database.entities.Round
@@ -128,5 +129,10 @@ object DatabaseModule {
     @Provides
     fun provideCourseHoleDao(database: GolfDatabase): CourseHoleDao {
         return database.courseHoleDao
+    }
+
+    @Provides
+    fun provideRoundHoleDao(database: GolfDatabase): RoundHoleDao {
+        return database.roundHoleDao
     }
 }

@@ -11,15 +11,27 @@ import com.example.golfapp.database.entities.Round
 import com.example.golfapp.database.daos.CourseDao
 import com.example.golfapp.database.daos.CourseHoleDao
 import com.example.golfapp.database.daos.RoundDao
+import com.example.golfapp.database.daos.RoundHoleDao
+import com.example.golfapp.database.entities.Club
+import com.example.golfapp.database.entities.HoleStat
+import com.example.golfapp.database.entities.RoundHole
+import com.example.golfapp.database.entities.Settings
+import com.example.golfapp.database.entities.Shot
 import com.example.golfapp.util.Converters
 
 @Database(
     entities = [
         Course::class,
         CourseHole::class,
-        Round::class
+        Round::class,
+        RoundHole::class,
+        Club::class,
+        Shot::class,
+        HoleStat::class,
+        Settings::class
     ],
-    version = 2
+    version = 3,
+    exportSchema = false // this is to avoid schema export warnings during development
 )
 @TypeConverters(Converters::class)
 abstract class GolfDatabase: RoomDatabase() {
@@ -27,7 +39,9 @@ abstract class GolfDatabase: RoomDatabase() {
     abstract val courseDao: CourseDao
     abstract val courseHoleDao: CourseHoleDao
     abstract val roundDao: RoundDao
+    abstract val roundHoleDao: RoundHoleDao
 
+    // TODO - delete this?
     companion object {
         @Volatile
         private var INSTANCE: GolfDatabase? = null

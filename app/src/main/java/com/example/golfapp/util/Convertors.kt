@@ -1,6 +1,7 @@
 package com.example.golfapp.util
 
 import androidx.room.TypeConverter
+import com.example.golfapp.util.Stat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -20,6 +21,12 @@ class Converters {
 
     @TypeConverter
     fun toWind(wind: String): Wind = Wind.valueOf(wind)
+
+    @TypeConverter
+    fun fromStat(stat: Stat): String = stat.name
+
+    @TypeConverter
+    fun toStat(stat: String): Stat = Stat.valueOf(stat)
 
     @TypeConverter
     fun fromLocalDate(date: LocalDate?): String? = date?.format(formatter)

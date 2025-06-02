@@ -4,6 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.example.golfapp.util.Converters
+import com.example.golfapp.util.Stat
 
 @Entity(
     foreignKeys = [
@@ -16,9 +19,10 @@ import androidx.room.PrimaryKey
         )
     ]
 )
+@TypeConverters(Converters::class)
 data class HoleStat(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "round_hole_id") val roundHoleId: Int,
-    val type: Enum<Stat>,
+    val type: Stat,
     val value: Int,
 )
