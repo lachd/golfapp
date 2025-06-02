@@ -9,9 +9,11 @@ import com.example.golfapp.database.daos.CourseDao
 import com.example.golfapp.database.daos.CourseHoleDao
 import com.example.golfapp.database.daos.RoundDao
 import com.example.golfapp.database.daos.RoundHoleDao
+import com.example.golfapp.database.daos.SettingsDao
 import com.example.golfapp.database.entities.Course
 import com.example.golfapp.database.entities.CourseHole
 import com.example.golfapp.database.entities.Round
+import com.example.golfapp.database.entities.Setting
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,8 +59,6 @@ object DatabaseModule {
                             GolfDatabase::class.java,
                             "golf_database"
                         ).build()
-
-                        populateTestDataIfNeeded(database)
                         clearTestRounds(database)
                     }
                 }
@@ -68,20 +68,11 @@ object DatabaseModule {
 
     }
 
-    private suspend fun populateTestDataIfNeeded(database: GolfDatabase) {
-        val courseDao = database.courseDao
-        val courseHoleDao = database.courseHoleDao
-
-        // Check if we already have courses
-        val existingCourses = courseDao.getCourses()
-        if (existingCourses.isEmpty()) {
-            populateTestData(database)
-        }
-    }
 
     private suspend fun populateTestData(database: GolfDatabase) {
         val courseDao = database.courseDao
         val courseHoleDao = database.courseHoleDao
+        val settingDao = database.settingDao
 
         // Insert your test courses
         val moruya = Course(name = "Moruya")
@@ -95,6 +86,7 @@ object DatabaseModule {
         courseDao.upsertCourse(catalina)
 
         // Add some holes for Moruya as an example
+        val indexes = (1..18).shuffled()
         for (i in 1..18) {
             courseHoleDao.upsertCourseHole(
                 CourseHole(
@@ -105,10 +97,16 @@ object DatabaseModule {
                         2, 3 -> 3
                         else -> 5
                     },
-                    index = i
+                    index = indexes.get(i-1)
                 )
             )
         }
+
+        // Add a handicap
+        settingDao.upsertSetting(setting = Setting(
+            key = "handicap",
+            value = "16"
+        ))
     }
 
     private suspend fun clearTestRounds(database: GolfDatabase) {
@@ -146,5 +144,10 @@ object DatabaseModule {
     @Provides
     fun provideRoundHoleDao(database: GolfDatabase): RoundHoleDao {
         return database.roundHoleDao
+    }
+
+    @Provides
+    fun provideSettingDao(database: GolfDatabase): SettingsDao {
+        return database.settingDao
     }
 }
